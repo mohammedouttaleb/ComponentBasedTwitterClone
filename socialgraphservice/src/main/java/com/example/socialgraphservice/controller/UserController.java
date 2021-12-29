@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,8 @@ public class UserController {
     //POST relations
 
     @PostMapping("/follow/{tagFollower}/fld={tagFollowed}")
-    public void follow(@PathVariable("tagFollower") String tagFollower, @PathVariable("tagFollowed") String tagFollowed){
+    public void follow(@PathVariable("tagFollower") String tagFollower, @PathVariable("tagFollowed") String tagFollowed) throws URISyntaxException {
+        System.out.println("This is Social Graph Service");
         User follower = userRepository.findByUserTag(tagFollower);
         User followed = userRepository.findByUserTag(tagFollowed);
         userService.follow(follower, followed);
