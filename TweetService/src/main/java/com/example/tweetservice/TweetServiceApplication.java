@@ -9,9 +9,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @SpringBootApplication
 public class TweetServiceApplication implements CommandLineRunner {
@@ -27,12 +25,12 @@ public class TweetServiceApplication implements CommandLineRunner {
         TweetService tweet = new TweetService();
         List<String> hashTags = new ArrayList<>();
         hashTags.add("JADER");
-        List<Long> likes = new ArrayList<>();
-        List<Long> retweets = new ArrayList<>();
-        likes.add((long) 1);
-        likes.add((long) 2);
-        retweets.add((long) 1);
-        Reactions react = new Reactions(likes,retweets,(long)2);
+        Set<String> likes = new HashSet<>();
+        Set<String> retweets = new HashSet<>();
+        likes.add("1");
+        likes.add("2");
+        retweets.add("1");
+        Reactions react = new Reactions(likes,retweets,"2");
         tweet.setReactions(react);
         tweet.setHashtags(hashTags);
         tweet.setCreationDate(new Date().toInstant());

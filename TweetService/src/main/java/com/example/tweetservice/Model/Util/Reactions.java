@@ -3,17 +3,20 @@ package com.example.tweetservice.Model.Util;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class Reactions {
 
-    private List<Long> likes;
-    private List<Long> retweets;
-    private Long tweetId;
+    private Reaction type;
+    private Set<String> likes;
+    private Set<String> retweets;
+    private String tweetId;
 
-    public Reactions(List<Long> likes, List<Long> retweets,Long tweetId) {
+    public Reactions(Set<String> likes, Set<String> retweets,String tweetId) {
         this.likes = likes;
         this.retweets = retweets;
         this.tweetId = tweetId;
     }
 }
+

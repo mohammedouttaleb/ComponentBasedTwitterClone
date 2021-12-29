@@ -9,5 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TweetServiceRepository extends MongoRepository<TweetService, Long> {
-    Optional<List<TweetService>> findByCreatorId(Long creatorId);
+    Optional<List<TweetService>> findByCreatorId(String creatorId);
+
+    Optional<TweetService> findById(String id);
 }

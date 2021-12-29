@@ -4,5 +4,5 @@ public enum Visibility {
     ALL,
     FOLLOWERS,
     FOLLOWED,
-    NONE,
+    NONE
 }

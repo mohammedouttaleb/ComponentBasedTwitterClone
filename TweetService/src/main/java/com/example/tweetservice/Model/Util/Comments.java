@@ -9,6 +9,6 @@ public class Comments {
     private String id;
     private Long userId;
     private Long tweetId;
-
+    private Multimedia commentContent;
 
 }
