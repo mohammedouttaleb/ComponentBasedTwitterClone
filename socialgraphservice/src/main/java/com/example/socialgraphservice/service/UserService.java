@@ -1,17 +1,26 @@
 package com.example.socialgraphservice.service;
 
 import com.example.socialgraphservice.dto.UserDTO;
+import com.example.socialgraphservice.dto.UserDtoOut;
 import com.example.socialgraphservice.model.User;
 import com.example.socialgraphservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @Service
 public class UserService {
+
+
 
     private final UserRepository userRepository;
 
@@ -33,15 +42,27 @@ public class UserService {
         follower.removesFollow(followed);
         userRepository.save(follower);
     }
-    public void follow(User follower, User followed) {
+    public void follow(User follower, User followed) throws URISyntaxException {
         if (!isFollower(follower, followed)) {
             System.out.println("NEW FOLLOW");
             addFollow(follower, followed);
+            sendCreateRoomRequest(follower,followed);
         }
         else {
             removeFollow(follower, followed);
             System.out.println("REMOVED FOLLOW");
         }
+    }
+    private void  sendCreateRoomRequest(User follower, User followed) throws URISyntaxException {
+        RestTemplate restTemplate = new RestTemplate();
+
+        final String baseUrl = "http://localhost:"+3000+"/createRoom/";
+        URI uri = new URI(baseUrl);
+
+        UserDtoOut userDtoOut = new UserDtoOut(follower.getUserTag(), followed.getUserTag());
+
+        ResponseEntity<String> result = restTemplate.postForEntity(uri, userDtoOut, String.class);
+        System.out.println(result);
     }
     public int numFollowers(User user) {
         return userRepository.findByFollowsUserTag(user.getUserTag()).size();
