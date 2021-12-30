@@ -11,17 +11,40 @@ import java.util.stream.Collectors;
 @Node
 public class User {
 
+    public static final int DISCOVERABLE_TO_ALL = 0;
+    public static final int NOT_DISCOVERABLE = 1;
+    public static final int DISCOVERABLE_TO_FOLLOWED = 2;
+    private int setting;
+
+
     @Id
-    @GeneratedValue
     private Long id;
 
     private String userTag;
 
+//    private Configuration configuration;
+
     public User() {
     }
 
+    public int getSetting() {
+        return setting;
+    }
+
+    public void setSetting(int setting) {
+        this.setting = setting;
+    }
+
+
     public User(String userTag) {
         this.userTag = userTag;
+        this.setting = DISCOVERABLE_TO_ALL;
+    }
+
+    public User(Long userId) {
+        this.id = userId;
+        this.userTag = String.valueOf(userId);
+        this.setting = DISCOVERABLE_TO_ALL;
     }
 
     @Relationship(type = "FOLLOWING", direction = Relationship.Direction.OUTGOING)
@@ -116,5 +139,9 @@ public class User {
 
     public void setUserTag(String userTag) {
         this.userTag = userTag;
+    }
+
+    public Long getId() {
+        return id;
     }
 }
