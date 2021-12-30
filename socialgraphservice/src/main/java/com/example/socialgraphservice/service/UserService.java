@@ -13,8 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 @Service
@@ -64,9 +63,11 @@ public class UserService {
         ResponseEntity<String> result = restTemplate.postForEntity(uri, userDtoOut, String.class);
         System.out.println(result);
     }
+
     public int numFollowers(User user) {
         return userRepository.findByFollowsUserTag(user.getUserTag()).size();
     }
+
     public int numFollows(User user) {
         return user.follows.size();
     }
@@ -143,5 +144,56 @@ public class UserService {
             followersDTO.add(new UserDTO(user));
         }
         return followersDTO;
+    }
+
+    public Set<User> getFollows(Long userId) {
+        System.out.println(userId);
+        System.out.println(userId != null);
+        Set<User> follows = userRepository.findById(userId).get().follows;
+        return follows;
+    }
+
+    public Set<Object> getRecommendations(Long userId) {
+        Set<User> follows = userRepository.findById(userId).get().follows;
+        List<Long> follows_2ndLevel= new ArrayList<>();
+        Set<Long> follows_2ndLevelSet = new HashSet<>();
+        for (User follow: follows) {
+            List<User> recommendations = new ArrayList<>(follow.follows);
+            for (User recommendation: recommendations) {
+                follows_2ndLevel.add(recommendation.getId());
+                follows_2ndLevelSet.add(recommendation.getId());
+            }
+        }
+        Map<Long, Integer> occurrences = new HashMap<>();
+        for (Long recommendation: follows_2ndLevelSet) {
+            occurrences.put(recommendation, Collections.frequency(follows_2ndLevel, recommendation));
+        }
+        Comparator<Map.Entry<Long, Integer>> valueComparator = Map.Entry.comparingByValue();
+        List<Map.Entry<Long, Integer>> sortedRecommendations = new ArrayList<>(occurrences.entrySet());
+        Collections.sort(sortedRecommendations, valueComparator);
+        Set<Object> sortedRecommendationsList = new HashSet<>();
+        Set<Object> recommendationsSet = new HashSet<>();
+        for (Map.Entry<Long, Integer> recommendation: sortedRecommendations) {
+            String uri = "http://192.168.43.96:8080/api/auth/id=" + recommendation.getKey();
+            RestTemplate restTemplate = new RestTemplate();
+            recommendationsSet.add(restTemplate.getForObject(uri, Object.class));
+//            assert recommendationsSet != null;
+            sortedRecommendationsList.addAll(recommendationsSet);
+            if (sortedRecommendationsList.size() > 4) break;
+        }
+        return sortedRecommendationsList;
+    }
+
+    public void addUserById(Long userId) {
+        userRepository.save(new User(userId));
+    }
+
+    public Set<Long> getFollowsIds(Long userId) {
+        Set<User> follows = userRepository.findById(userId).get().follows;
+        Set<Long> followsId = new HashSet<>();
+        for (User follow: follows) {
+            followsId.add(follow.getId());
+        }
+        return followsId;
     }
 }

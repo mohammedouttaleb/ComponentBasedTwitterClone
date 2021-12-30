@@ -19,12 +19,13 @@ import java.util.Optional;
 
 @RestController(value = "/TweetServices")
 @Validated
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class TweetServiceController {
 
     @Autowired
     private TweetServiceService tweetServiceService;
 
-    @GetMapping("GetAllTweets")
+    @GetMapping("/getAllTweets")
     public List<TweetService> loadAllTweets(){
         return tweetServiceService.getAllTweets();
     }

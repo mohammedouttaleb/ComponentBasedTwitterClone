@@ -29,6 +29,11 @@ public class UserController {
 
     //POST relations
 
+    @PostMapping("/adduser/{userId}")
+    public void addUser(@PathVariable Long userId) {
+        userService.addUserById(userId);
+    }
+
     @PostMapping("/follow/{tagFollower}/fld={tagFollowed}")
     public void follow(@PathVariable("tagFollower") String tagFollower, @PathVariable("tagFollowed") String tagFollowed) throws URISyntaxException {
         System.out.println("This is Social Graph Service");
@@ -63,9 +68,17 @@ public class UserController {
         return userService.findByFollowsUserTag(userTag);
     }
 
-    @GetMapping("/follows/{userTag}")
-    public Set<User> getFollows(@PathVariable("userTag") String userTag) {
-        return userRepository.findByUserTag(userTag).follows;
+    @GetMapping("/follows/{userId}")
+    public Set<User> getFollows(@PathVariable("userId") Long userId) {
+//        return userRepository.findByUserTag(userTag).follows;
+        System.out.println(userId);
+        return userService.getFollows(userId);
+    }
+    @GetMapping("/followsIds/{userId}")
+    public Set<Long> getFollowsIds(@PathVariable("userId") Long userId) {
+//        return userRepository.findByUserTag(userTag).follows;
+        System.out.println(userId);
+        return userService.getFollowsIds(userId);
     }
 
     @GetMapping("/mutes/{userTag}")
@@ -86,6 +99,11 @@ public class UserController {
     @GetMapping("/reporters/{userTag}")
     public List<User> getReporters(@PathVariable("userTag") String userTag) {
         return userRepository.findByReportsUserTag(userTag);
+    }
+
+    @GetMapping("/recommendations/{userId}")
+    public Set<Object> getRecommendations(@PathVariable Long userId) {
+        return userService.getRecommendations(userId);
     }
 
     //GET numbers
