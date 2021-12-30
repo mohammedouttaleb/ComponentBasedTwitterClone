@@ -14,8 +14,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -28,7 +33,6 @@ public class AuthenticationController {
 
     @Autowired
     UserRepository userRepository;
-
 
     @Autowired
     PasswordEncoder encoder;
@@ -57,8 +61,27 @@ public class AuthenticationController {
         User user = new User(signUpRequest.getFullName(), signUpRequest.getEmail(), signUpRequest.getUserName(), encoder.encode(signUpRequest.getPassword()), signUpRequest.getLocation(),
                 signUpRequest.getPhoneNumber());
 
-        userRepository.save(user);
-
+        user = userRepository.save(user);
+        final String uri = "http://192.168.43.20:8082/adduser/" + user.getId();
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.postForEntity(uri, null, String.class);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    @GetMapping("/token={token}")
+    public Long getCurrentUserId(@PathVariable String token) {
+        if (token != null && jwtUtils.validateJwtToken(token)) {
+            String email = jwtUtils.getUserNameFromJwtToken(token);
+//            System.err.println(email);
+            Long userId = userRepository.findByUserName(email).get().getId();
+            return userId;
+        }
+        return null;
+    }
+
+    @GetMapping("/id={userId}")
+    public User getUserById(@PathVariable Long userId) {
+        User user = userRepository.findById(userId).get();
+        return user;
     }
 }
